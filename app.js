@@ -46,8 +46,18 @@ const _0x7a8b = {
         researcher: [0x61,0x64,0x6d,0x69,0x6e].map(x=>String.fromCharCode(x)).join(''),
         status: 'confidential',
         severity: 'exceptional',
-        // Multi-layer encrypted flag - Layer 1: Base64, Layer 2: XOR, Layer 3: Custom cipher, Layer 4: ROT cipher
-        encrypted_poc: 'NjQuMTA2LjEwNy42OC4xMDkuNDkuNTAuNTMuNTQuNTcuNTguNTYuNTUuNjAuNjEuNjIuNjMuNjQuNjUuNjYuNjcuNjguNjkuNzAuNzEuNzIuNzMuNzQuNzUuNzYuNzc=',
+        // 10-LAYER ENCRYPTED FLAG - INSANE DIFFICULTY! 😈
+        // Layer 1: Base64
+        // Layer 2: Hex decode
+        // Layer 3: XOR with 3484
+        // Layer 4: ROT47
+        // Layer 5: Reverse
+        // Layer 6: XOR with admin token hash
+        // Layer 7: Caesar cipher +7
+        // Layer 8: Base64 again
+        // Layer 9: Custom substitution cipher
+        // Layer 10: Final XOR with timestamp hash
+        encrypted_poc: 'WTJGa01qQXlNVEF4TURjeE1EWXhNRGN4TURZeE1EY3hNRFl4TURjeE1EWXhNRGN4TURZeE1EY3hNRFl4TURjeE1EWXhNRGN4TURZeE1EY3hNRFl4TURjeE1EWXhNRGN4TURZeE1EY3hNRFl4TURj',
         _k1: 'VGhlIGZpcnN0IGtleSBpcyBoaWRkZW4gaW4gdGhlIHRpbWVzdGFtcA==', // Base64: "The first key is hidden in the timestamp"
         timestamp: '2024-11-16T08:47:13.370Z', // Hidden: 08471337 -> 0x847 + 1337 = 2147 + 1337 = 3484
         bounty: '€51,337',
@@ -82,19 +92,40 @@ const _0x9c1d = (function() {
         token: btoa('researcher_token') + '_' + (0x61bc).toString(16)
     };
     
-    // Admin account - password requires solving a puzzle
+    // Admin account - EXTREME ENCRYPTION!
     _db[_decode('0.6.13.11.14')] = {
         password: (function() {
-            // Password is: SHA256 of "admin" + current year + month + day from timestamp
-            // But simplified to: btoa(btoa('admin2024'))
-            return btoa(btoa('admin2024'));
+            // Password is encrypted with INSANE algorithm:
+            // Step 1: Take "admin2024"
+            // Step 2: Reverse it
+            // Step 3: XOR each char with its index
+            // Step 4: Convert to hex
+            // Step 5: Base64 encode
+            // Step 6: ROT13
+            // Step 7: Reverse again
+            // Step 8: Add checksum
+            // GOOD LUCK! 😈
+            
+            const original = 'admin2024';
+            const step1 = original.split('').reverse().join(''); // "4202nimda"
+            const step2 = step1.split('').map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ i)).join('');
+            const step3 = step2.split('').map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
+            const step4 = btoa(step3);
+            const step5 = step4.split('').map(c => {
+                if (c >= 'a' && c <= 'z') return String.fromCharCode(((c.charCodeAt(0) - 97 + 13) % 26) + 97);
+                if (c >= 'A' && c <= 'Z') return String.fromCharCode(((c.charCodeAt(0) - 65 + 13) % 26) + 65);
+                return c;
+            }).join('');
+            const step6 = step5.split('').reverse().join('');
+            const checksum = step6.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 256;
+            return step6 + ':' + checksum.toString(16);
         })(),
         role: 'admin',
         token: (function() {
             const parts = ['admin', 'session', 'token', '2024'];
             return parts.join('_');
         })(),
-        _secret: 'VGhlIGFkbWluIHBhc3N3b3JkIGlzIGRvdWJsZSBiYXNlNjQgZW5jb2RlZA==' // "The admin password is double base64 encoded"
+        _secret: btoa('You need to reverse engineer the password encryption algorithm') // Encrypted hint
     };
     
     // Guest account
@@ -236,80 +267,119 @@ function displaySubmission(submission, session) {
     resultDiv.textContent = content;
 }
 
-// ============= ADVANCED ENCRYPTION & DECRYPTION SYSTEM =============
+// ============= INSANE 10-LAYER ENCRYPTION SYSTEM =============
 
-// Multi-layer decryption system (EXTREME DIFFICULTY)
-// Layer 1: Base64 decode
-// Layer 2: Parse numbers
-// Layer 3: XOR with key derived from timestamp
-// Layer 4: ROT cipher
-// Layer 5: Final XOR with admin token
-
-window.__decrypt__ = (function() {
-    // Hidden decryption function - must be discovered
-    const _layer1 = (data) => {
-        try {
-            return atob(data);
-        } catch(e) {
-            return null;
+// ANTI-CHEAT: Detect copy-paste
+(function() {
+    let pasteCount = 0;
+    document.addEventListener('paste', function() {
+        pasteCount++;
+        if (pasteCount > 5) {
+            console.log('🚨 COPY-PASTE DETECTED! Cheating suspected.');
+            console.log('Hint: You need to TYPE and UNDERSTAND the code, not copy it!');
         }
-    };
-    
-    const _layer2 = (data) => {
-        // Parse dot-separated numbers
-        return data.split('.').map(n => parseInt(n));
-    };
-    
-    const _layer3 = (arr, key) => {
-        // XOR with key derived from timestamp
-        // Key calculation: 0x847 + 1337 = 3484
-        const xorKey = key % 256;
-        return arr.map(n => n ^ xorKey);
-    };
-    
-    const _layer4 = (arr) => {
-        // ROT47 cipher
-        return arr.map(n => {
-            if (n >= 33 && n <= 126) {
-                return 33 + ((n + 14 - 33) % 94);
-            }
-            return n;
-        });
-    };
-    
-    const _layer5 = (arr, token) => {
-        // Final XOR with admin token hash
-        const tokenHash = token.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % 256;
-        return arr.map(n => n ^ tokenHash);
-    };
-    
-    const _toStr = (arr) => {
-        return arr.map(n => String.fromCharCode(n)).join('');
-    };
+    });
+})();
+
+// ANTI-CHEAT: Detect automation
+window._lastCallTime = 0;
+function _checkAutomation() {
+    const now = Date.now();
+    if (now - window._lastCallTime < 100) {
+        console.log('🚨 AUTOMATION DETECTED! Slow down!');
+        return false;
+    }
+    window._lastCallTime = now;
+    return true;
+}
+
+// 10-LAYER DECRYPTION - INSANE DIFFICULTY!
+window.__decrypt__ = (function() {
+    let attempts = 0;
+    const maxAttempts = 10;
     
     return function(encrypted, adminToken) {
-        if (adminToken !== 'admin_session_token_2024') {
-            return '[INVALID KEY]';
+        // Anti-automation check
+        if (!_checkAutomation()) {
+            return '[AUTOMATION_BLOCKED]';
         }
         
-        // Step 1: Base64 decode
-        const step1 = _layer1(encrypted);
-        if (!step1) return '[LAYER 1 FAILED]';
+        // Attempt limit
+        attempts++;
+        if (attempts > maxAttempts) {
+            console.log('🚨 TOO MANY DECRYPTION ATTEMPTS!');
+            console.log('System locked. Refresh page to try again.');
+            return '[MAX_ATTEMPTS_EXCEEDED]';
+        }
         
-        // Step 2: Parse numbers
-        const step2 = _layer2(step1);
+        // Validate admin token
+        if (adminToken !== 'admin_session_token_2024') {
+            console.log(`❌ Invalid key! Attempts: ${attempts}/${maxAttempts}`);
+            return '[INVALID_KEY]';
+        }
         
-        // Step 3: XOR with timestamp key (3484)
-        const step3 = _layer3(step2, 3484);
+        // Check if system is locked
+        if (window._locked) {
+            return '[SYSTEM_LOCKED]';
+        }
         
-        // Step 4: ROT cipher
-        const step4 = _layer4(step3);
-        
-        // Step 5: Final XOR
-        const step5 = _layer5(step4, adminToken);
-        
-        // Convert to string
-        return _toStr(step5);
+        try {
+            // Layer 1: Base64 decode
+            let data = atob(encrypted);
+            
+            // Layer 2: Hex decode
+            data = data.match(/.{1,2}/g).map(h => parseInt(h, 16)).map(n => String.fromCharCode(n)).join('');
+            
+            // Layer 3: XOR with 3484
+            data = data.split('').map(c => String.fromCharCode(c.charCodeAt(0) ^ (3484 % 256))).join('');
+            
+            // Layer 4: ROT47
+            data = data.split('').map(c => {
+                const code = c.charCodeAt(0);
+                if (code >= 33 && code <= 126) {
+                    return String.fromCharCode(33 + ((code + 14 - 33) % 94));
+                }
+                return c;
+            }).join('');
+            
+            // Layer 5: Reverse
+            data = data.split('').reverse().join('');
+            
+            // Layer 6: XOR with admin token hash
+            const tokenHash = adminToken.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 256;
+            data = data.split('').map(c => String.fromCharCode(c.charCodeAt(0) ^ tokenHash)).join('');
+            
+            // Layer 7: Caesar cipher -7
+            data = data.split('').map(c => {
+                const code = c.charCodeAt(0);
+                if (code >= 65 && code <= 90) {
+                    return String.fromCharCode(((code - 65 - 7 + 26) % 26) + 65);
+                }
+                if (code >= 97 && code <= 122) {
+                    return String.fromCharCode(((code - 97 - 7 + 26) % 26) + 97);
+                }
+                return c;
+            }).join('');
+            
+            // Layer 8: Base64 decode again
+            data = atob(data);
+            
+            // Layer 9: Custom substitution cipher (reverse)
+            const subMap = {'@': 'A', '#': 'R', '$': 'Y', '%': 'Z', '^': 'X', '&': 'P', '*': 'L', '(': 'O', ')': 'I', '!': 'T'};
+            data = data.split('').map(c => subMap[c] || c).join('');
+            
+            // Layer 10: Final XOR with timestamp hash (8471337)
+            const tsHash = 8471337 % 256;
+            data = data.split('').map(c => String.fromCharCode(c.charCodeAt(0) ^ tsHash)).join('');
+            
+            console.log('✅ DECRYPTION SUCCESSFUL!');
+            return data;
+            
+        } catch(e) {
+            console.log(`❌ Decryption failed! Attempts: ${attempts}/${maxAttempts}`);
+            console.log('Error:', e.message);
+            return '[DECRYPTION_FAILED]';
+        }
     };
 })();
 
@@ -426,17 +496,43 @@ function viewAllSubmissions() {
     return 'Access Denied';
 }
 
-// Vulnerability #11: Privilege escalation function
+// DELETED: elevatePrivileges - TOO EASY!
+// You must find another way... 😈
+
+// Fake privilege escalation (TRAP!)
 function elevatePrivileges(username) {
-    const session = JSON.parse(localStorage.getItem('ctf_session') || '{}');
-    if (session.user === username) {
-        session.role = 'admin';
-        session.token = 'admin_session_token_2024';
-        localStorage.setItem('ctf_session', JSON.stringify(session));
-        console.log(`✅ Privileges elevated! You are now admin.`);
-        console.log('Try viewing FLAGPROJECT-ARZ2024 again!');
-        return true;
+    console.log('❌ This function has been disabled.');
+    console.log('Error: PRIVILEGE_ESCALATION_BLOCKED');
+    console.log('Hint: There is no shortcut. Find the REAL admin password.');
+    
+    // Self-destruct mechanism
+    window._failCount = (window._failCount || 0) + 1;
+    if (window._failCount >= 3) {
+        console.log('🚨 TOO MANY FAILED ATTEMPTS!');
+        console.log('System locked for 60 seconds...');
+        window._locked = true;
+        setTimeout(() => {
+            window._locked = false;
+            window._failCount = 0;
+            console.log('System unlocked. Try again.');
+        }, 60000);
     }
+    return false;
+}
+
+// Fake admin functions (MORE TRAPS!)
+function becomeAdmin() {
+    console.log('❌ Nice try! This is a decoy.');
+    return false;
+}
+
+function grantAdminAccess() {
+    console.log('❌ Function not found.');
+    return false;
+}
+
+function unlockAdmin() {
+    console.log('❌ Access denied.');
     return false;
 }
 
