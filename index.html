@@ -222,7 +222,8 @@
             const status = document.getElementById('webhookStatus');
             const url = document.getElementById('webhookUrl').value;
             
-            if (url && url.includes('discord.com/api/webhooks')) {
+            // Accept both discord.com and discordapp.com
+            if (url && (url.includes('discord.com/api/webhooks') || url.includes('discordapp.com/api/webhooks'))) {
                 status.className = 'status online';
                 status.textContent = 'Webhook Configured';
                 CONFIG.WEBHOOK_URL = url;
