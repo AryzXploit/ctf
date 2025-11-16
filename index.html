@@ -174,7 +174,7 @@
                 type="text" 
                 id="webhookUrl" 
                 placeholder="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN"
-                value="">
+                value="https://discordapp.com/api/webhooks/1436328098105659475/BF6k132AhabUEVgB5OBudx3kYnSqGgKq6ySyXBlDIxNWUBDHVabANLNIWrulUYiRq5FT">
             <p style="margin-top: 10px; font-size: 12px; color: #666;">
                 Get your webhook: Discord Server → Channel Settings → Integrations → Webhooks
             </p>
@@ -438,7 +438,16 @@
         
         // Initialize
         log('🔍 PoC initialized', 'info');
-        log('⚙️ Configure Discord webhook above to start', 'info');
+        
+        // Auto-load webhook from input field
+        setTimeout(() => {
+            updateWebhookStatus();
+            if (CONFIG.WEBHOOK_URL) {
+                log('✅ Discord webhook configured', 'success');
+            } else {
+                log('⚙️ Configure Discord webhook above to start', 'info');
+            }
+        }, 500);
     </script>
 </body>
 </html>
