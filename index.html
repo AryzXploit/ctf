@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submission Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- SGludDogVGhlIHNlY3JldCBsaWVzIGluIHRoZSBzb3VyY2U= -->
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Submission Portal</h1>
+            <p>FLAGPROJECT-ARZ2024</p>
+        </div>
+
+        <div class="login-box">
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">Access</button>
+        </div>
+
+        <div id="content" class="hidden">
+            <input type="text" id="submission-id" placeholder="Submission ID">
+            <button onclick="viewSubmission()">View</button>
+            <div id="result"></div>
+            
+            <!-- Hidden canvas for visual puzzle -->
+            <canvas id="puzzle" width="400" height="100" style="display:none; border: 1px solid #000; margin-top: 20px; cursor: crosshair;"></canvas>
+        </div>
+        
+        <!-- Hidden clickable area for secret -->
+        <div id="secret-zone" style="position: fixed; bottom: 0; right: 0; width: 50px; height: 50px; opacity: 0; cursor: pointer;" onclick="window.__secretClick__()" title=""></div>
+
+        <!-- Hints hidden in HTML comments -->
+        <!-- H1: The first layer is always the easiest -->
+        <!-- H2: 0x847 + 1337 = ? -->
+        <!-- H3: Look for functions that don't belong -->
+        <!-- H4: Double encoding is twice the fun -->
+        <!-- H5: XOR is your friend, but which key? -->
+        <!-- H6: The answer lies in 64.106.107... -->
+        <!-- H7: ROT13? ROT47? Or something else? -->
+        <!-- H8: Timestamps hold more than just time -->
+        <!-- H9: _0x variables are not random -->
+        <!-- H10: Check window object for hidden gems -->
+        
+        <div class="footer">
+            <!-- VGhlIGZsYWcgaXMgbXVsdGktbGF5ZXIgZW5jcnlwdGVk -->
+            <span>v1.0.0</span>
+            <!-- RmluZCB0aGUgX19pbml0X18gZnVuY3Rpb24= -->
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <!-- Q2hlY2sgdGhlIGNvbnNvbGUgZm9yIG1vcmUgaGludHM= -->
+</body>
+</html>
